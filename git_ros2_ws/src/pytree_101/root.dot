@@ -1,0 +1,29 @@
+digraph pastafarianism {
+ordering=out;
+graph [fontname="times-roman"];
+node [fontname="times-roman"];
+edge [fontname="times-roman"];
+Root [fillcolor=cyan, fontcolor=black, fontsize=9, label="Ⓜ Root", shape=octagon, style=filled];
+AnaAkis [fillcolor=orange, fontcolor=black, fontsize=9, label="Ⓜ AnaAkis", shape=box, style=filled];
+Root -> AnaAkis;
+Uyan [fillcolor=gray, fontcolor=black, fontsize=9, label=Uyan, shape=ellipse, style=filled];
+AnaAkis -> Uyan;
+Kahvalti [fillcolor=gray, fontcolor=black, fontsize=9, label=Kahvalti, shape=ellipse, style=filled];
+AnaAkis -> Kahvalti;
+SecimAgaci [fillcolor=cyan, fontcolor=black, fontsize=9, label="Ⓜ SecimAgaci", shape=octagon, style=filled];
+AnaAkis -> SecimAgaci;
+CalisAkisi [fillcolor=orange, fontcolor=black, fontsize=9, label="Ⓜ CalisAkisi", shape=box, style=filled];
+SecimAgaci -> CalisAkisi;
+Calis [fillcolor=gray, fontcolor=black, fontsize=9, label=Calis, shape=ellipse, style=filled];
+CalisAkisi -> Calis;
+Dinlen [fillcolor=gray, fontcolor=black, fontsize=9, label=Dinlen, shape=ellipse, style=filled];
+CalisAkisi -> Dinlen;
+SporAkisi [fillcolor=orange, fontcolor=black, fontsize=9, label="Ⓜ SporAkisi", shape=box, style=filled];
+SecimAgaci -> SporAkisi;
+Spor [fillcolor=gray, fontcolor=black, fontsize=9, label=Spor, shape=ellipse, style=filled];
+SporAkisi -> Spor;
+"Dinlen*" [fillcolor=gray, fontcolor=black, fontsize=9, label="Dinlen*", shape=ellipse, style=filled];
+SporAkisi -> "Dinlen*";
+Idle [fillcolor=gray, fontcolor=black, fontsize=9, label=Idle, shape=ellipse, style=filled];
+Root -> Idle;
+}
