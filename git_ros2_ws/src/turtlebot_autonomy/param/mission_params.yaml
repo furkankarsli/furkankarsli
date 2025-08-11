@@ -1,0 +1,12 @@
+# mission_params.yaml
+# Sadece hız limitleri buraya gelecek.
+controller_server:
+  ros__parameters:
+    max_vel_x: 0.5           # Maksimum ileri doğrusal hız (m/s)
+    max_vel_theta: 2.0        # Maksimum açısal hız (rad/s)
+    acc_lim_x: 6.0            # Doğrusal ivme limiti (m/s²)
+    acc_lim_theta: 2.5        # Açısal ivme limiti (rad/s²)
+    decel_lim_x: -6.0         # Doğrusal yavaşlama limiti
+    decel_lim_theta: -2.5     # Açısal yavaşlama limiti
+    min_vel_x: 0.1
+    min_vel_theta: 0.1
