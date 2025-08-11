@@ -18,13 +18,13 @@ class TestBehaviorTree(Node):
         self.get_logger().info(f'Komut gönderildi: {command}')
         
     def test_sequence(self):
-        """Test sırası: task_1 -> idle -> sarj"""
-        commands = ['task_1', 'idle', 'sarj']
+        """Test sırası: task1 -> task2 -> task3"""
+        commands = ['task1', 'task2', 'task3']
         
         for cmd in commands:
             self.send_command(cmd)
-            self.get_logger().info(f'{cmd} komutu gönderildi, 10 saniye bekleniyor...')
-            time.sleep(10)
+            self.get_logger().info(f'{cmd} komutu gönderildi, 15 saniye bekleniyor...')
+            time.sleep(15)
             
         self.get_logger().info('Test tamamlandı!')
 

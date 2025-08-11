@@ -8,6 +8,18 @@ from turtle_tasks.turtle_behavior_tree import create_service_robot_tree
 import sys
 import logging
 import os
+from datetime import datetime
+
+def write_to_log(message: str):
+    """Log mesajını dosyaya yazar"""
+    try:
+        log_dir = os.path.join(os.path.dirname(__file__), "logs")
+        log_file = os.path.join(log_dir, "run_tree.log")
+        
+        with open(log_file, "a", encoding="utf-8") as f:
+            f.write(message + "\n")
+    except Exception as e:
+        print(f"Log yazma hatası: {e}")
 
 # VIEWER İÇİN GEREKLİ DOĞRU İÇE AKTARMALAR
 # from py_trees_ros.visitors import TreeToMsgVisitor
@@ -75,6 +87,8 @@ class BehaviorTreeNode(Node):
         # Loglama ve konsol çıktısı için olan kodlar aynı kalıyor
         current_tree_snapshot = py_trees.display.ascii_tree(self.tree.root, show_status=True)
         if current_tree_snapshot != self.last_tree_snapshot:
+            log_msg = f"[{datetime.now().strftime('%H:%M:%S')}] Ağaç Durumu Değişti"
+            write_to_log(log_msg)
             self.file_logger.info("Ağaç Durumu Değişti:\n" + current_tree_snapshot)
             self.last_tree_snapshot = current_tree_snapshot
             
@@ -85,6 +99,8 @@ class BehaviorTreeNode(Node):
             f"failed_task: {bb.get('failed_task')}"
         )
         if current_blackboard_str != self.last_blackboard_str:
+             log_msg = f"[{datetime.now().strftime('%H:%M:%S')}] Blackboard Değişti: {current_blackboard_str}"
+             write_to_log(log_msg)
              self.file_logger.info(f"Blackboard Değişti: {current_blackboard_str}")
              self.last_blackboard_str = current_blackboard_str
         

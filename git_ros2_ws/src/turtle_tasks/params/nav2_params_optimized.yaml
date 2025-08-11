@@ -182,12 +182,12 @@ local_costmap:
       width: 3
       height: 3
       resolution: 0.1  # Artırıldı: 0.05 -> 0.1 (daha az hesaplama)
-      robot_radius: 0.18  # Artırıldı: 0.16 -> 0.18 (daha güvenli)
+      robot_radius: 0.16  # TurtleBot3 Waffle için doğru boyut
       plugins: ["voxel_layer", "inflation_layer"]
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
         cost_scaling_factor: 2.5  # Azaltıldı: 3.0 -> 2.5
-        inflation_radius: 0.2  # Artırıldı: 0.15 -> 0.2
+        inflation_radius: 0.15  # Daha küçük inflation (geçiş için yer bırakır)
       voxel_layer:
         plugin: "nav2_costmap_2d::VoxelLayer"
         enabled: True
@@ -221,7 +221,7 @@ global_costmap:
       global_frame: map
       robot_base_frame: base_link
       use_sim_time: True
-      robot_radius: 0.18  # Artırıldı: 0.16 -> 0.18
+      robot_radius: 0.16  # TurtleBot3 Waffle için doğru boyut
       resolution: 0.1  # Artırıldı: 0.05 -> 0.1
       track_unknown_space: true
       plugins: ["static_layer", "obstacle_layer", "inflation_layer"]
@@ -336,3 +336,4 @@ velocity_smoother:
     odom_duration: 0.2  # Artırıldı: 0.1 -> 0.2
     deadband_velocity: [0.0, 0.0, 0.0]
     velocity_timeout: 2.0  # Artırıldı: 1.0 -> 2.0
+

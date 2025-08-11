@@ -1,16 +1,31 @@
-import py_trees
 import rclpy
 from rclpy.node import Node
-from rclpy.action import ActionClient
+from rclpy.action import ActionClient, ClientGoalHandle
 from nav2_msgs.action import NavigateToPose
 from std_msgs.msg import String
-from rclpy.action.client import ClientGoalHandle
-import logging 
+import py_trees
+import py_trees.behaviours
+import py_trees.composites
+import py_trees.decorators
+import py_trees.blackboard
+import logging
 import time
+import os
+from datetime import datetime
 
-# ==============================================================================
-#  TEMEL DAVRANIŞLAR
-# ==============================================================================
+def write_tree_log(message: str):
+    try:
+        log_dir = os.path.join(os.path.expanduser("~/ros2_ws/src/turtle_tasks"), "logs")
+        log_file = os.path.join(log_dir, "treeloglari.txt")
+        
+        timestamp = datetime.now().strftime('%H:%M:%S')
+        log_message = f"[{timestamp}] {message}\n"
+        
+        with open(log_file, "a", encoding="utf-8") as f:
+            f.write(log_message)
+    except Exception as e:
+        print(f"Log yazma hatası: {e}")
+
 class Navigate(py_trees.behaviour.Behaviour):
     def __init__(self, name: str, node: Node, pose: dict, location_name: str, logger: logging.Logger):
         super().__init__(name)
@@ -23,8 +38,8 @@ class Navigate(py_trees.behaviour.Behaviour):
         self.goal_handle: ClientGoalHandle = None
         self.final_status = None
         self.start_time = None
-        self.timeout_seconds = 300.0  # 5 dakika timeout
-        self.max_retries = 5  # 5 kez retry
+        self.timeout_seconds = 300.0
+        self.max_retries = 5
         self.retry_count = 0
         self.is_initialized = False
 
@@ -40,6 +55,7 @@ class Navigate(py_trees.behaviour.Behaviour):
         if self.final_status == py_trees.common.Status.FAILURE:
             return
 
+        write_tree_log(f"{self.name}: {self.location_name} konumuna gidiliyor. Hedef: {self.pose}")
         self.logger.info(f"[{self.name}] {self.location_name} konumuna gidiliyor. Hedef: {self.pose}")
         self.start_time = time.time()
         self.is_initialized = True
@@ -80,13 +96,13 @@ class Navigate(py_trees.behaviour.Behaviour):
             status = result.status
             self.logger.info(f"[{self.name}] Navigasyon sonucu geldi. Durum Kodu: {status}")
             
-            if status == 4:  # SUCCEEDED
+            if status == 4:
                 self.final_status = py_trees.common.Status.SUCCESS
                 self.logger.info(f"[{self.name}] Navigasyon başarılı!")
-            elif status == 5:  # CANCELED
+            elif status == 5:
                 self.logger.warning(f"[{self.name}] Görev iptal edildi.")
                 self.final_status = py_trees.common.Status.FAILURE
-            elif status == 6:  # ABORTED
+            elif status == 6:
                 self.logger.warning(f"[{self.name}] Görev iptal edildi (ABORTED).")
                 self.final_status = py_trees.common.Status.FAILURE
             else:
@@ -98,14 +114,12 @@ class Navigate(py_trees.behaviour.Behaviour):
             self.final_status = py_trees.common.Status.FAILURE
 
     def update(self) -> py_trees.common.Status:
-        # Timeout kontrolü
         if self.start_time and time.time() - self.start_time > self.timeout_seconds:
             self.logger.warning(f"[{self.name}] Timeout! {self.timeout_seconds} saniye geçti.")
             if self.goal_handle:
                 self.goal_handle.cancel_goal_async()
             self.final_status = py_trees.common.Status.FAILURE
         
-        # Retry mekanizması - sadece gerçek hatalarda çalışsın
         if (self.final_status == py_trees.common.Status.FAILURE and 
             self.retry_count < self.max_retries and 
             self.is_initialized):
@@ -135,13 +149,11 @@ class Navigate(py_trees.behaviour.Behaviour):
             self.blackboard.set("robot_location", self.location_name)
             self.logger.info(f"[{self.name}] Başarıyla ulaşıldı. Yeni konum karatahtaya yazıldı: {self.location_name}")
         elif new_status == py_trees.common.Status.FAILURE:
-            # Başarısız görevi blackboard'a kaydet
             current_command = self.blackboard.get("last_command")
             if current_command:
                 self.blackboard.set("failed_task", current_command)
                 self.logger.warning(f"[{self.name}] Görev başarısız, yeniden denenecek: {current_command}")
         
-        # Reset state
         self.goal_handle = None
         self.final_status = None
         self.start_time = None
@@ -149,7 +161,6 @@ class Navigate(py_trees.behaviour.Behaviour):
         self.retry_count = 0
 
 class Wait(py_trees.behaviour.Behaviour):
-    """Belirtilen süre kadar bekleyen davranış"""
     def __init__(self, name: str, wait_time: float):
         super().__init__(name)
         self.wait_time = wait_time
@@ -157,11 +168,9 @@ class Wait(py_trees.behaviour.Behaviour):
 
     def initialise(self):
         self.start_time = time.time()
-        print(f"[{self.name}] {self.wait_time} saniye bekleniyor...")
 
     def update(self) -> py_trees.common.Status:
         if time.time() - self.start_time >= self.wait_time:
-            print(f"[{self.name}] Bekleme tamamlandı!")
             return py_trees.common.Status.SUCCESS
         return py_trees.common.Status.RUNNING
 
@@ -173,19 +182,22 @@ class CheckForCommand(py_trees.behaviour.Behaviour):
 
     def update(self) -> py_trees.common.Status:
         command = self.blackboard.get("last_command")
+        write_tree_log(f"{self.name}: Beklenen='{self.expected_command}', Gelen='{command}'")
+        
         if command == self.expected_command:
+            write_tree_log(f"{self.name}: Komut eşleşti! SUCCESS")
             return py_trees.common.Status.SUCCESS
+        
+        write_tree_log(f"{self.name}: Komut eşleşmedi! FAILURE")
         return py_trees.common.Status.FAILURE
 
 class ClearCommand(py_trees.behaviour.Behaviour):
-    """Komutu temizleyen davranış"""
     def __init__(self, name: str = "Komutu Temizle"):
         super().__init__(name)
         self.blackboard = py_trees.blackboard.Blackboard()
 
     def update(self) -> py_trees.common.Status:
         self.blackboard.set("last_command", None)
-        print("Görev tamamlandı, komut temizlendi.")
         return py_trees.common.Status.SUCCESS
 
 class CheckLocation(py_trees.behaviour.Behaviour):
@@ -208,84 +220,55 @@ class CommandSubscriber(py_trees.behaviour.Behaviour):
         self.subscription = node.create_subscription(String, "/robot_command", self.command_callback, 10)
 
     def command_callback(self, msg):
+        write_tree_log(f"CommandSubscriber: Yeni komut alındı: '{msg.data}'")
         self.node.get_logger().info(f"Yeni komut alındı: '{msg.data}'")
         self.blackboard.set("last_command", msg.data)
 
     def update(self) -> py_trees.common.Status:
         return py_trees.common.Status.SUCCESS
 
-class BatteryManager(py_trees.behaviour.Behaviour):
-    """Şarj yönetimi davranışı"""
-    def __init__(self, name: str = "Şarj Yöneticisi"):
+class BatteryMonitor(py_trees.behaviour.Behaviour):
+    def __init__(self, name: str = "Batarya Monitörü"):
         super().__init__(name)
         self.blackboard = py_trees.blackboard.Blackboard()
         self.battery_level = 100.0
         self.last_update = time.time()
-        self.charging = False
-        self.charge_start_time = None
 
     def update(self) -> py_trees.common.Status:
         current_time = time.time()
-        
-        # Şarj istasyonunda mı kontrol et
         current_location = self.blackboard.get("robot_location")
-        if current_location == "sarj":
-            if not self.charging:
-                self.charging = True
-                self.charge_start_time = current_time
-                print(f"[{self.name}] Şarj başladı...")
+        write_tree_log(f"{self.name}: Mevcut konum: {current_location}, Batarya: {self.battery_level:.1f}%")
+        
+        if current_location != "sarj":
+            if current_time - self.last_update >= 60.0:
+                self.battery_level = 20.0
+                self.last_update = current_time
+                write_tree_log(f"{self.name}: Batarya kritik seviyeye düştü: %{self.battery_level}")
             
-            # 20 saniye şarj ol
-            if current_time - self.charge_start_time >= 20.0:
-                self.battery_level = 100.0
-                self.charging = False
-                print(f"[{self.name}] Şarj tamamlandı! Batarya: %{self.battery_level}")
-                return py_trees.common.Status.SUCCESS
-                
-            return py_trees.common.Status.RUNNING
-        else:
-            self.charging = False
-            self.charge_start_time = None
-        
-        # Şarj istasyonunda değilse batarya azalır (120 saniyede)
-        if current_time - self.last_update >= 120.0:
-            self.battery_level -= 20.0  # 120 saniyede %20 azalır
-            self.last_update = current_time
-            print(f"[{self.name}] Batarya azaldı: %{self.battery_level}")
-        
-        # Batarya kritik seviyede mi?
-        if self.battery_level <= 20.0:
-            print(f"[{self.name}] Batarya kritik! Şarj istasyonuna gidiliyor...")
-            self.blackboard.set("battery_low", True)
-            return py_trees.common.Status.FAILURE
-        
-        self.blackboard.set("battery_low", False)
-        return py_trees.common.Status.SUCCESS
-
-class ReturnToIdle(py_trees.behaviour.Behaviour):
-    """Görev tamamlandığında idle'a dönen davranış"""
-    def __init__(self, name: str = "Idle'a Dön"):
-        super().__init__(name)
-        self.blackboard = py_trees.blackboard.Blackboard()
-
-    def update(self) -> py_trees.common.Status:
-        current_location = self.blackboard.get("robot_location")
-        if current_location == "idle":
-            print(f"[{self.name}] Zaten idle konumundayız.")
+            if self.battery_level <= 20.0:
+                write_tree_log(f"{self.name}: BATARYA KRİTİK! Acil şarj gerekli!")
+                self.blackboard.set("battery_low", True)
+                return py_trees.common.Status.FAILURE
+            
+            self.blackboard.set("battery_low", False)
             return py_trees.common.Status.SUCCESS
-        else:
-            print(f"[{self.name}] Idle konumuna dönülüyor...")
-            # Bu davranış Navigate davranışı ile birlikte kullanılacak
-            return py_trees.common.Status.RUNNING
+        
+        if self.battery_level >= 100.0:
+            self.blackboard.set("battery_low", False)
+            return py_trees.common.Status.SUCCESS
+        
+        if current_time - self.last_update >= 10.0:
+            self.battery_level = 100.0
+            self.last_update = current_time
+            write_tree_log(f"{self.name}: Şarj tamamlandı! Batarya: %{self.battery_level}")
+            return py_trees.common.Status.SUCCESS
+            
+        return py_trees.common.Status.RUNNING
 
-# ==============================================================================
-#  DAVRANIŞ AĞACI OLUŞTURMA
-# ==============================================================================
 def create_service_robot_tree(node: Node, logger: logging.Logger) -> py_trees.behaviour.Behaviour:
-    
-    # Yeni konumlar: sarj(x=0), idle(x=1), A(x=2), B(x=3), C(x=4)
     POSES = {
-        "sarj": {'x': 0.0, 'y': 0.0, 'oz': 0.0, 'ow': 1.000},
+        "baslangic": {'x': 0.0, 'y': 0.0, 'oz': 0.0, 'ow': 1.000},
+        "sarj": {'x': 0.2, 'y': 0.0, 'oz': 0.0, 'ow': 1.000},
         "idle": {'x': 1.0, 'y': 0.0, 'oz': 0.0, 'ow': 1.000},
         "A": {'x': 2.0, 'y': 0.0, 'oz': 0.0, 'ow': 1.000},
         "B": {'x': 3.0, 'y': 0.0, 'oz': 0.0, 'ow': 1.000},
@@ -297,84 +280,76 @@ def create_service_robot_tree(node: Node, logger: logging.Logger) -> py_trees.be
         policy=py_trees.common.ParallelPolicy.SuccessOnAll()
     )
 
-    # Navigasyon davranışları
     go_to_sarj = Navigate(name="sarjaGit", node=node, pose=POSES["sarj"], location_name="sarj", logger=logger)
     go_to_idle = Navigate(name="idleaGit", node=node, pose=POSES["idle"], location_name="idle", logger=logger)
-    go_to_A = Navigate(name="AyaGit", node=node, pose=POSES["A"], location_name="A", logger=logger)
-    go_to_B = Navigate(name="ByeGit", node=node, pose=POSES["B"], location_name="B", logger=logger)
-    go_to_C = Navigate(name="CyeGit", node=node, pose=POSES["C"], location_name="C", logger=logger)
     
-    # Bekleme davranışları
-    wait_2sec = Wait(name="2SaniyeBekle", wait_time=2.0)
+    go_to_A_task1 = Navigate(name="AyaGit_Task1", node=node, pose=POSES["A"], location_name="A", logger=logger)
+    go_to_A_task2 = Navigate(name="AyaGit_Task2", node=node, pose=POSES["A"], location_name="A", logger=logger)
+    go_to_B_task2 = Navigate(name="ByeGit_Task2", node=node, pose=POSES["B"], location_name="B", logger=logger)
+    go_to_A_task3 = Navigate(name="AyaGit_Task3", node=node, pose=POSES["A"], location_name="A", logger=logger)
+    go_to_B_task3 = Navigate(name="ByeGit_Task3", node=node, pose=POSES["B"], location_name="B", logger=logger)
+    go_to_C_task3 = Navigate(name="CyeGit_Task3", node=node, pose=POSES["C"], location_name="C", logger=logger)
     
-    # Diğer davranışlar
+    wait_charge = Wait(name="ŞarjBekle", wait_time=10.0)
+    wait_task1 = Wait(name="Task1Bekle", wait_time=2.0)
+    wait_task2_A = Wait(name="Task2ABekle", wait_time=2.0)
+    wait_task2_B = Wait(name="Task2BBekle", wait_time=2.0)
+    wait_task3_A = Wait(name="Task3ABekle", wait_time=2.0)
+    wait_task3_B = Wait(name="Task3BBekle", wait_time=2.0)
+    wait_task3_C = Wait(name="Task3CBekle", wait_time=2.0)
+    
     background_tasks = CommandSubscriber(name="KomutDinleyici", node=node)
-    battery_manager = BatteryManager(name="ŞarjYöneticisi")
     
     main_logic = py_trees.composites.Selector(name="Ana Mantık", memory=False)
 
-    # ==============================================================================
-    # GÖREV SIRALARI (SEKANSLAR)
-    # ==============================================================================
-
-    # 1. Öncelik: Şarj düşükse şarj istasyonuna git
-    charge_sequence = py_trees.composites.Sequence(name="ŞarjEt", memory=True)
-    charge_sequence.add_children([
-        py_trees.decorators.FailureIsSuccess(name="BataryaKontrol", child=battery_manager),
-        CheckLocation(name="sarjtaMi?", location="sarj"),
+    emergency_charge = py_trees.composites.Sequence(name="AcilŞarj", memory=True)
+    emergency_charge.add_children([
+        BatteryMonitor(name="BataryaKontrol"),
         go_to_sarj,
-        wait_2sec,  # Şarj için bekle
+        wait_charge,
         ClearCommand(name="ŞarjKomutunuTemizle")
     ])
 
-    # 2. Öncelik: Task1 - A'ya git ve 2 saniye bekle
     task1_sequence = py_trees.composites.Sequence(name="Task1", memory=True)
     task1_sequence.add_children([
         CheckForCommand(name="task1KomutuVarMi?", expected_command="task1"),
-        go_to_A,
-        wait_2sec,
+        go_to_A_task1,
+        wait_task1,
         ClearCommand(name="Task1KomutunuTemizle")
     ])
 
-    # 3. Öncelik: Task2 - A'ya git, B'ye git, 2'şer saniye bekle
     task2_sequence = py_trees.composites.Sequence(name="Task2", memory=True)
     task2_sequence.add_children([
         CheckForCommand(name="task2KomutuVarMi?", expected_command="task2"),
-        go_to_A,
-        wait_2sec,
-        go_to_B,
-        wait_2sec,
+        go_to_A_task2,
+        wait_task2_A,
+        go_to_B_task2,
+        wait_task2_B,
         ClearCommand(name="Task2KomutunuTemizle")
     ])
 
-    # 4. Öncelik: Task3 - A'ya git, B'ye git, C'ye git, 2'şer saniye bekle
     task3_sequence = py_trees.composites.Sequence(name="Task3", memory=True)
     task3_sequence.add_children([
         CheckForCommand(name="task3KomutuVarMi?", expected_command="task3"),
-        go_to_A,
-        wait_2sec,
-        go_to_B,
-        wait_2sec,
-        go_to_C,
-        wait_2sec,
+        go_to_A_task3,
+        wait_task3_A,
+        go_to_B_task3,
+        wait_task3_B,
+        go_to_C_task3,
+        wait_task3_C,
         ClearCommand(name="Task3KomutunuTemizle")
     ])
 
-    # 5. Öncelik: Görev tamamlandıysa idle'a dön
     return_to_idle_sequence = py_trees.composites.Sequence(name="Idle'aDön", memory=True)
     return_to_idle_sequence.add_children([
-        py_trees.decorators.SuccessIsFailure(name="GörevVarMi?", child=CheckForCommand(name="HerhangiGörevVarMi?", expected_command="task1")),
-        py_trees.decorators.SuccessIsFailure(name="GörevVarMi2?", child=CheckForCommand(name="HerhangiGörevVarMi2?", expected_command="task2")),
-        py_trees.decorators.SuccessIsFailure(name="GörevVarMi3?", child=CheckForCommand(name="HerhangiGörevVarMi3?", expected_command="task3")),
         CheckLocation(name="idledaMi?", location="idle"),
         go_to_idle
     ])
 
-    # 6. Öncelik: Hiçbir görev yoksa bekle
     idle = py_trees.behaviours.Running(name="Bosta")
 
     main_logic.add_children([
-        charge_sequence,
+        emergency_charge,
         task1_sequence,
         task2_sequence, 
         task3_sequence,
@@ -382,11 +357,11 @@ def create_service_robot_tree(node: Node, logger: logging.Logger) -> py_trees.be
         idle
     ])
     
-    root.add_children([background_tasks, battery_manager, main_logic])
+    root.add_children([background_tasks, main_logic])
     
-    # Başlangıç değerlerini ayarlama
-    py_trees.blackboard.Blackboard().set("robot_location", "sarj")  # Başlangıçta şarj istasyonunda
+    py_trees.blackboard.Blackboard().set("robot_location", "baslangic")
     py_trees.blackboard.Blackboard().set("last_command", None)
     py_trees.blackboard.Blackboard().set("battery_low", False)
+    py_trees.blackboard.Blackboard().set("failed_task", None)
 
     return root
