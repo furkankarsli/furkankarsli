@@ -53,14 +53,8 @@ ros2 run turtle_tasks command_publisher
 Eğer robot komutları alıyor ama hareket etmiyorsa:
 
 1. **Nav2 Durumunu Kontrol Et:**
-```bash
-ros2 run turtle_tasks debug_robot
-```
 
 2. **Nav2 Action Server'ı Test Et:**
-```bash
-ros2 run turtle_tasks test_nav2
-```
 
 3. **Topic'leri Kontrol Et:**
 ```bash
@@ -83,8 +77,6 @@ ros2 action list
 
 ## Debug Araçları
 
-- `debug_robot`: Robot durumunu ve Nav2 bağlantısını kontrol eder
-- `test_nav2`: Nav2 action server'ını test eder
 - `run_tree`: Ana behavior tree'yi çalıştırır
 - `command_publisher`: Robot komutlarını yayınlar
 
