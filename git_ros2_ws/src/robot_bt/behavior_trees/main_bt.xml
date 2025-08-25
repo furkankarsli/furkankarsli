@@ -1,0 +1,59 @@
+<root main_tree_to_execute="MainTree">
+    <BehaviorTree ID="MainTree">
+        <Fallback name="MainFallback">
+            <!-- Acil Durumlar - En Yüksek Öncelik -->
+            <Sequence name="EmergencySequence">
+                <IsEmergencyStop/>
+                <EmergencyStop/>
+            </Sequence>
+            
+            <!-- Güvenlik Kontrolleri -->
+            <Sequence name="SafetySequence">
+                <IsRobotStuck/>
+                <UnstickRobot/>
+            </Sequence>
+            
+            <!-- Batarya Yönetimi -->
+            <Sequence name="BatteryManagementSequence">
+                <IsBatteryCritical/>
+                <GoToDock/>
+                <Charge/>
+            </Sequence>
+            
+            <!-- Ana Temizlik Döngüsü -->
+            <Sequence name="MainCleaningSequence">
+                <!-- Başlangıç Kontrolleri -->
+                <Sequence name="StartupChecks">
+                    <IsRobotReady/>
+                    <InitializeSensors/>
+                    <CheckEnvironment/>
+                </Sequence>
+                
+                <!-- Paralel Temizlik ve İzleme -->
+                <Parallel name="CleaningAndMonitoring" success_threshold="1" failure_threshold="1">
+                    <!-- Temizlik Görevleri -->
+                    <Sequence name="CleaningTasks">
+                        <SelectCleaningMode/>
+                        <ExecuteCleaningPattern/>
+                        <MonitorCleaningProgress/>
+                    </Sequence>
+                    
+                    <!-- Sürekli İzleme -->
+                    <Sequence name="ContinuousMonitoring">
+                        <MonitorBatteryLevel/>
+                        <MonitorObstacles/>
+                        <MonitorSurfaceType/>
+                        <MonitorCleaningEfficiency/>
+                    </Sequence>
+                </Parallel>
+                
+                <!-- Temizlik Sonrası -->
+                <Sequence name="PostCleaningSequence">
+                    <ReturnToDock/>
+                    <GenerateCleaningReport/>
+                    <WaitForNextTask/>
+                </Sequence>
+            </Sequence>
+        </Fallback>
+    </BehaviorTree>
+</root>

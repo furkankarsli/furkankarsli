@@ -1,0 +1,12 @@
+# Hedef (Goal)
+bool start_cleaning
+
+---
+
+# Sonuç (Result)
+bool success
+
+---
+
+# Geri bildirim (Feedback)
+int32 percentage_cleaned
