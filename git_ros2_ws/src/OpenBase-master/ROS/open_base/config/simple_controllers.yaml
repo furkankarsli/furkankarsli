@@ -1,0 +1,29 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 50  # Hz
+
+    # Joint state broadcaster
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    # Simple velocity controller for wheels
+    velocity_controller:
+      type: velocity_controllers/JointGroupVelocityController
+      joints:
+        - left_rim_joint
+        - right_rim_joint
+        - back_rim_joint
+      command_interfaces:
+        - velocity
+      state_interfaces:
+        - position
+        - velocity
+
+# Hardware interface
+hardware_interface:
+  ros__parameters:
+    joints:
+      - left_rim_joint
+      - right_rim_joint
+      - back_rim_joint
+

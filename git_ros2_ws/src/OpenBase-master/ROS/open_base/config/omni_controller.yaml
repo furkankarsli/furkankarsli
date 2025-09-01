@@ -1,0 +1,40 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 50  # Hz
+    use_sim_time: true
+
+    # Joint state broadcaster
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    # Omnidirectional controller for 3 wheels
+    omnidirectional_controller:
+      type: omnidirectional_controllers/OmnidirectionalController
+
+# Omnidirectional robot specific parameters
+omnidirectional_controller:
+  ros__parameters:
+    # Wheel names (must match URDF joint names)
+    wheel_names: 
+      - left_rim_joint
+      - right_rim_joint
+      - back_rim_joint
+
+    # Robot parameters
+    robot_radius: 0.15  # Distance from center to wheel (adjust based on your robot)
+    wheel_radius: 0.05  # Wheel radius (adjust based on your robot)
+    gamma: 30.0  # Angle between body fixed y axis and the normal of wheel3 (back wheel)
+
+    # Publishing parameters
+    publish_rate: 50.0
+    odom_frame_id: odom
+    base_frame_id: base_link
+    pose_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.01]
+    twist_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.01]
+    odom_numeric_integration_method: runge_kutta2
+
+    # Control parameters
+    open_loop: false  # Use wheel feedback for odometry
+    enable_odom_tf: true
+    cmd_vel_timeout: 0.5
+    use_stamped_vel: false
