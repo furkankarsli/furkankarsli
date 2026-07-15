@@ -60,16 +60,7 @@ I am a **Mechatronics Engineer** specializing in autonomous mobile robots (AMRs)
   </tr>
 </table>
 
----
 
-## 📈 GitHub Statistics
-
-<p align="left">
-  <img src="https://github-stats-extended.vercel.app/api?username=furkankarsli&show_icons=true&theme=tokyonight&count_private=true" alt="Furkan's GitHub Stats" height="180" />
-  <img src="https://github-stats-extended.vercel.app/api/top-langs/?username=furkankarsli&layout=compact&theme=tokyonight" alt="Furkan's Top Languages" height="180" />
-</p>
-
----
 
 ## 🌟 Featured Projects
 
