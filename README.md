@@ -67,6 +67,7 @@ I am a **Mechatronics Engineer** specializing in autonomous mobile robots (AMRs)
 ### 1. [ROS2 Behavior Tree Autonomy & Navigation Workspace](./git_ros2_ws)
 A robust ROS2 workspace implementing modern robot autonomy architectures using Behavior Trees and State Machines.
 - **Packages**:
+  - `agv_autonomy`: Clean, industry-standard simulation and control package for the **Nebula Forklift AGV** executing Gazebo navigation and safety-critical Behavior Trees (`py_trees`).
   - `robot_bt`: Custom C++ and Python executor managing action servers (`CleanArea.action`), cmd_vel publishers, and simulated battery/distance sensors.
   - `turtle_tasks`: Runs optimized Nav2 parameters (`nav2_params_optimized.yaml`) for differential drive AMRs executing complex BT tasks.
   - `turtlebot_autonomy`: Automates high-level missions using the SMACH state machine framework.
