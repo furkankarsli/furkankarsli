@@ -64,13 +64,15 @@ I am a **Mechatronics Engineer** specializing in autonomous mobile robots (AMRs)
 
 ## 🌟 Featured Projects
 
-### 1. [AMR Forklift Simulation & Autonomy (amr_forklift)](https://github.com/furkankarsli/amr_forklift)
-An industry-standard ROS2 simulation and autonomy package for the **Nebula Forklift AMR**, featuring physics-based Gazebo integration and a safety-critical behavior tree.
-- **Core Features**:
-  - **Autonomy Behavior Tree**: Implemented using `py_trees` to monitor battery, manage automatic docking/charging states, and handle emergency safety stops.
-  - **AMR Forklift URDF**: Customized forklift geometry with prismatic joints (`lift_joint`) and parameterized passive rollers.
-  - **Nebula Arena**: Custom simulated world environment in Gazebo with multiple path networks.
-- **Tech Stack**: `ROS2 (Humble)`, `Python (py_trees)`, `Xacro (URDF)`, `Gazebo`, `RViz2`.
+### 1. [ROS2 Autonomy & Behavior Trees Workspace (pytrees)](https://github.com/furkankarsli/pytrees)
+A comprehensive, industry-standard ROS2 workspace implementing robot autonomy architectures, physics simulations, and safety-critical Behavior Trees.
+- **Key Packages**:
+  - `amr_forklift`: Clean simulation and control package for the **Nebula Forklift AMR** executing Gazebo navigation and safety-critical Behavior Trees (`py_trees`).
+  - `robot_bt`: Custom C++ and Python executor managing action servers (`CleanArea.action`), cmd_vel publishers, and simulated battery/distance sensors.
+  - `turtle_tasks`: Runs optimized Nav2 parameters (`nav2_params_optimized.yaml`) for differential drive AMRs executing complex BT tasks.
+  - `turtlebot_autonomy`: Automates high-level missions using the SMACH state machine framework.
+  - `SimpleExamplesForBehaviorTree`: Teaches the basics of `behaviortree_cpp`, `smach`, and `py_trees`.
+- **Tech Stack**: `ROS2 (Humble)`, `Python (py_trees)`, `C++`, `SMACH`, `Nav2`, `Gazebo`, `RViz2`.
 
 ### 2. [Distributed Industrial IoT Ecosystem](https://github.com/furkankarsli/fkstech-iot)
 A multi-node telemetry system for industrial monitoring and automation control.
@@ -85,15 +87,6 @@ An advanced client-side web synthesizer for generating audio frequencies and bin
 - **Core Engine**: Implements a complete DSP graph using the Web Audio API with multi-oscillator modulation, dynamic stereo panning, and automatic clipping prevention via gain scheduling and compressor nodes.
 - **Offline Rendering**: Utilizes `lamejs` and `OfflineAudioContext` to synthesize and encode custom frequency paths into high-quality MP3s directly in the browser.
 - **Tech Stack**: `Vanilla JavaScript`, `Web Audio API (DSP)`, `HTML5 Canvas (Oscilloscope)`, `CSS3`.
-
-### 4. [ROS2 Behavior Tree Autonomy Tutorial Workspace](./git_ros2_ws)
-A robust ROS2 workspace implementing basic robot autonomy architectures using Behavior Trees and State Machines.
-- **Packages**:
-  - `robot_bt`: Custom C++ and Python executor managing action servers (`CleanArea.action`), cmd_vel publishers, and simulated battery/distance sensors.
-  - `turtle_tasks`: Runs optimized Nav2 parameters (`nav2_params_optimized.yaml`) for differential drive AMRs executing complex BT tasks.
-  - `turtlebot_autonomy`: Automates high-level missions using the SMACH state machine framework.
-  - `SimpleExamplesForBehaviorTree`: Teaches the basics of `behaviortree_cpp`, `smach`, and `py_trees`.
-- **Tech Stack**: `ROS2 (Humble)`, `Python`, `C++`, `Behavior Trees`, `SMACH`, `Nav2`, `Gazebo`.
 
 ---
 
