@@ -10,11 +10,11 @@
 
 ## 🚀 About Me
 
-I am a **Mechatronics Engineer** specializing in autonomous mobile robots (AMRs), robotic software architectures, and smart IoT ecosystems. My expertise lies at the intersection of hardware-software integration, control theory, and web interface visualization:
+I am a Mechatronics Engineer specializing in autonomous mobile robots (AMRs), robotic software architectures, and smart IoT ecosystems. My expertise lies at the intersection of hardware-software integration, control theory, and web interface visualization:
 
-- **Robotics (ROS2)**: Experienced in designing modular software nodes, mission state machines (SMACH), behavior trees (`py_trees`), SLAM mapping, and sensor synchronization (LIDAR, IMU, encoders).
-- **Embedded & IoT**: Designing secure, distributed IoT systems using ESP32, ESP-12E, and Raspberry Pi, communicating via UDP broadcast and authenticated REST HTTP APIs.
-- **Web Dashboards & DSP**: Developing responsive interfaces (Flask, WebSockets) to visualize real-time sensor streams and robot state execution, as well as browser-based digital signal processing (Web Audio API).
+- Robotics (ROS2): Experienced in designing modular software nodes, mission state machines (SMACH), behavior trees (`py_trees`), SLAM mapping, and sensor synchronization (LIDAR, IMU, encoders).
+- Embedded & IoT: Designing secure, distributed IoT systems using ESP32, ESP-12E, and Raspberry Pi, communicating via UDP broadcast and authenticated REST HTTP APIs.
+- Web Dashboards & DSP: Developing responsive interfaces (Flask, WebSockets) to visualize real-time sensor streams and robot state execution, as well as browser-based digital signal processing (Web Audio API).
 
 ---
 
@@ -64,29 +64,33 @@ I am a **Mechatronics Engineer** specializing in autonomous mobile robots (AMRs)
 
 ## 🌟 Featured Projects
 
-### 1. [ROS2 Autonomy & Behavior Trees Workspace (pytrees)](https://github.com/furkankarsli/pytrees)
-A comprehensive, industry-standard ROS2 workspace implementing robot autonomy architectures, physics simulations, and safety-critical Behavior Trees.
-- **Key Packages**:
-  - `amr_forklift`: Clean simulation and control package for the **Nebula Forklift AMR** executing Gazebo navigation and safety-critical Behavior Trees (`py_trees`).
-  - `robot_bt`: Custom C++ and Python executor managing action servers (`CleanArea.action`), cmd_vel publishers, and simulated battery/distance sensors.
-  - `turtle_tasks`: Runs optimized Nav2 parameters (`nav2_params_optimized.yaml`) for differential drive AMRs executing complex BT tasks.
-  - `turtlebot_autonomy`: Automates high-level missions using the SMACH state machine framework.
-  - `SimpleExamplesForBehaviorTree`: Teaches the basics of `behaviortree_cpp`, `smach`, and `py_trees`.
-- **Tech Stack**: `ROS2 (Humble)`, `Python (py_trees)`, `C++`, `SMACH`, `Nav2`, `Gazebo`, `RViz2`.
+### 1. [Nebula — Autonomous Forklift AMR](https://github.com/furkankarsli/amr_forklift) ⭐
+My main project — an end-to-end autonomous forklift AMR built on ROS 2 Humble, from real-time embedded motor control up to SLAM navigation and a browser-based operator interface. Developed for TEKNOFEST 2026 (Industrial Robotics, Finalist).
+
+▶ [Watch the demo (1:24)](https://youtu.be/zErqqptTmfQ)
+
+- I built the full stack: SLAM mapping, EKF sensor fusion (LiDAR + IMU + encoders), Nav2 path planning, embedded firmware (Arduino Mega 20 kHz PWM + PID, ESP32 lift controller over a WiFi/TCP bridge), and a web operator panel.
+- Solved real-world problems: stop-and-resume obstacle handling, self-blind-spot scan filtering, and a "100% CPU" issue traced to a stale build via load-average analysis.
+- Tech Stack: `ROS 2 (Humble)`, `Nav2`, `SLAM Toolbox`, `EKF`, `Arduino Mega`, `ESP32 (ESP-IDF)`, `Gazebo`, `Docker`.
 
 ### 2. [Distributed Industrial IoT Ecosystem](https://github.com/furkankarsli/fkstech-iot)
 A multi-node telemetry system for industrial monitoring and automation control.
-- **Architecture**:
-  - **Telemetry Nodes**: ESP-12E microcontrollers reading MQ-Gas, Flame, Temperature, and Humidity sensors, broadcasting UDP packets.
-  - **Central Gateway**: An ESP32 system (programmed in native ESP-IDF C using FreeRTOS) that handles UDP broadcasts and sends secure HTTP POST requests to the cloud.
-  - **Cloud Dashboard**: A Python Flask web server connected to a SQLite database displaying real-time sensor streams and controlling local actuators (Relays, OLED display mode, alarm LEDs).
-- **Tech Stack**: `ESP-IDF (C)`, `Arduino (C++)`, `FreeRTOS`, `Python (Flask)`, `SQLite`, `UDP/HTTP REST`.
+- Architecture:
+  - Telemetry Nodes: ESP-12E microcontrollers reading MQ-Gas, Flame, Temperature, and Humidity sensors, broadcasting UDP packets.
+  - Central Gateway: An ESP32 system (programmed in native ESP-IDF C using FreeRTOS) that handles UDP broadcasts and sends secure HTTP POST requests to the cloud.
+  - Cloud Dashboard: A Python Flask web server connected to a SQLite database displaying real-time sensor streams and controlling local actuators (Relays, OLED display mode, alarm LEDs).
+- Tech Stack: `ESP-IDF (C)`, `Arduino (C++)`, `FreeRTOS`, `Python (Flask)`, `SQLite`, `UDP/HTTP REST`.
 
-### 3. [Signal Lab & Frequency Synthesizer](https://github.com/furkankarsli/ses)
-An advanced client-side web synthesizer for generating audio frequencies and binaural/monaural wave entrainment structures.
-- **Core Engine**: Implements a complete DSP graph using the Web Audio API with multi-oscillator modulation, dynamic stereo panning, and automatic clipping prevention via gain scheduling and compressor nodes.
-- **Offline Rendering**: Utilizes `lamejs` and `OfflineAudioContext` to synthesize and encode custom frequency paths into high-quality MP3s directly in the browser.
-- **Tech Stack**: `Vanilla JavaScript`, `Web Audio API (DSP)`, `HTML5 Canvas (Oscilloscope)`, `CSS3`.
+---
+
+## 🏆 TEKNOFEST Achievements
+
+Finalist in multiple categories of TEKNOFEST (Turkey's largest technology competition), 2025–2026 — three of them still ongoing:
+
+- Industrial Digital Technologies AMR — 8th place in Turkey (2025)
+- Industrial Robotics Applications (autonomous forklift) — Finalist (2026, ongoing)
+- Smart Factory Systems Programming — Finalist, project score 96.5/100 (2026, ongoing)
+- Robolig (six-legged robot) — Finalist (2026, ongoing)
 
 ---
 
@@ -105,5 +109,5 @@ timeline
 
 ## 📫 Let's Connect!
 
-- 👔 **LinkedIn**: [linkedin.com/in/furkankarsli](https://linkedin.com/in/furkankarsli)
-- ✉️ **Email**: [furknkrsli@gmail.com](mailto:furknkrsli@gmail.com)
+- 👔 LinkedIn: [linkedin.com/in/furkankarsli](https://linkedin.com/in/furkankarsli)
+- ✉️ Email: [furknkrsli@gmail.com](mailto:furknkrsli@gmail.com)
